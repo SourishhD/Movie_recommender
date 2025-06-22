@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch Pro | Your Personal Movie Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #f8f9fa;
+            --text-color: #212529;
+            --card-bg: #ffffff;
+            --body-bg: #f8f9fa;
+            --gradient-start: #2b5876;
+            --gradient-end: #4e4376;
+        }
+
+        body.dark-mode {
+            --primary-color: #4285f4;
+            --secondary-color: #2d2d2d;
+            --text-color: #ffffff;
+            --card-bg: #333333;
+            --body-bg: #1a1a1a;
+            --gradient-start: #000428;
+            --gradient-end: #004e92;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .genre-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .genre-checkbox {
+            display: none;
+        }
+
+        .genre-label {
+            display: block;
+            padding: 0.5rem;
+            text-align: center;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.8rem;
+            border: 1px solid transparent;
+        }
+
+        .genre-checkbox:checked + .genre-label {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+            border-color: white;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .range-slider {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .range-slider .range-values {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .range-slider input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: var(--secondary-color);
+            border-radius: 2px;
+            outline: none;
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            margin-top: -8px;
+        }
+
+        .track-overlay {
+            display: none;
+        }
+
+        .manual-rating {
+            margin-top: 20px;
+        }
+
+        .manual-rating .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .manual-rating input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .manual-rating .btn {
+            padding: 8px 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .manual-rating .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .movie-card {
+            position: relative;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            height: 450px;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .movie-poster {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 60%, transparent 100%);
+            color: white;
+            transform: translateY(70%);
+            transition: transform 0.3s ease;
+        }
+
+        .movie-card:hover .movie-info {
+            transform: translateY(0);
+        }
+
+        .movie-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+
+        .movie-rating {
+            color: #ffd700;
+        }
+
+        .genre-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            margin: 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        .movie-description {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        #themeToggle {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #themeToggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 2rem 0;
+            gap: 0.5rem;
+        }
+
+        .pagination-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .pagination-button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .pagination-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            margin: 0 1rem;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-film me-2"></i>CineMatch Pro
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Discover Your Perfect Movie Match</h1>
+        <p>Explore our curated collection of films across all genres, ratings, and years. Find your next favorite movie with our smart recommendation system.</p>
+    </section>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-filter me-2"></i>Smart Filters
+                        </h5>
+                        <form id="filterForm">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Genres</label>
+                                <div class="genre-grid">
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="action" value="Action">
+                                        <label class="genre-label" for="action">Action</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="adventure" value="Adventure">
+                                        <label class="genre-label" for="adventure">Adventure</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="animation" value="Animation">
+                                        <label class="genre-label" for="animation">Animation</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="biography" value="Biography">
+                                        <label class="genre-label" for="biography">Biography</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="comedy" value="Comedy">
+                                        <label class="genre-label" for="comedy">Comedy</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="crime" value="Crime">
+                                        <label class="genre-label" for="crime">Crime</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="drama" value="Drama">
+                                        <label class="genre-label" for="drama">Drama</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="family" value="Family">
+                                        <label class="genre-label" for="family">Family</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="fantasy" value="Fantasy">
+                                        <label class="genre-label" for="fantasy">Fantasy</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="horror" value="Horror">
+                                        <label class="genre-label" for="horror">Horror</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="musical" value="Musical">
+                                        <label class="genre-label" for="musical">Musical</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="mystery" value="Mystery">
+                                        <label class="genre-label" for="mystery">Mystery</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="romance" value="Romance">
+                                        <label class="genre-label" for="romance">Romance</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="sci-fi" value="Sci-Fi">
+                                        <label class="genre-label" for="sci-fi">Sci-Fi</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="thriller" value="Thriller">
+                                        <label class="genre-label" for="thriller">Thriller</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="genre-checkbox" id="war" value="War">
+                                        <label class="genre-label" for="war">War</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <label>Rating Filter</label>
+                                <div class="rating-filter">
+                                    <div class="range-slider">
+                                        <div class="range-values">
+                                            <span>Rating: <span id="ratingValue">0.0</span></span>
+                                        </div>
+                                        <input type="range" id="rating" name="rating" 
+                                            min="0" max="10" step="0.1" value="0">
+                                        <div class="track-overlay"></div>
+                                    </div>
+                                    <div class="manual-rating">
+                                        <div class="input-group">
+                                            <input type="number" id="manualRating" class="form-control" 
+                                                min="0" max="10" step="0.1" placeholder="Enter rating (0-10)">
+                                            <button class="btn" type="button" id="applyManualRating">Apply</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <label>Year Range</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <input type="number" name="year_from" class="form-control" 
+                                            placeholder="From year" min="1900" max="2024">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" name="year_to" class="form-control" 
+                                            placeholder="To year" min="1900" max="2024">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="moviesGrid" class="movies-grid">
+                    <!-- Movies will be dynamically inserted here -->
+                </div>
+                <div class="pagination-container">
+                    <button class="pagination-button" id="prevPage" disabled>
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <span class="page-info">
+                        Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                    </span>
+                    <button class="pagination-button" id="nextPage">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+
+        // Set dark mode as default
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === null || savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            icon.classList.replace('fa-moon', 'fa-sun');
+            localStorage.setItem('theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Movie fetching and rendering
+        const moviesGrid = document.getElementById('moviesGrid');
+        const filterForm = document.getElementById('filterForm');
+        const yearInputs = filterForm.querySelectorAll('input[type="number"]');
+
+        // Rating slider functionality
+        const rating = document.getElementById('rating');
+        const ratingValue = document.getElementById('ratingValue');
+        const manualRating = document.getElementById('manualRating');
+        const applyManualRating = document.getElementById('applyManualRating');
+
+        function updateRatingValue() {
+            ratingValue.textContent = parseFloat(rating.value).toFixed(1);
+        }
+
+        rating.addEventListener('input', updateRatingValue);
+
+        let currentPage = 1;
+        const moviesPerPage = 12;
+        let totalPages = 1;
+
+        async function fetchMovies(filters = {}) {
+            try {
+                const params = new URLSearchParams();
+                
+                // Add pagination parameters
+                params.append('page', currentPage);
+                params.append('per_page', moviesPerPage);
+                
+                // Add genre filters
+                const selectedGenres = Array.from(document.querySelectorAll('.genre-checkbox:checked'))
+                    .map(cb => cb.value);
+                if (selectedGenres.length > 0) {
+                    params.append('genre', selectedGenres.join(','));
+                }
+
+                // Add rating filter
+                const ratingValue = parseFloat(rating.value);
+                if (ratingValue > 0) {
+                    params.append('rating', ratingValue);
+                }
+
+                // Add year filters
+                const yearFrom = filterForm.querySelector('[name="year_from"]').value;
+                const yearTo = filterForm.querySelector('[name="year_to"]').value;
+                if (yearFrom) params.append('year_from', yearFrom);
+                if (yearTo) params.append('year_to', yearTo);
+
+                console.log('Fetching movies with params:', params.toString());
+
+                const response = await fetch(`/api/movies?${params.toString()}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Received movies data:', data);
+
+                totalPages = Math.ceil(data.total / moviesPerPage);
+                updatePaginationControls();
+                renderMovies(data.movies);
+            } catch (error) {
+                console.error('Error fetching movies:', error);
+                moviesGrid.innerHTML = `
+                    <div class="no-results">
+                        <h3>Error loading movies</h3>
+                        <p>Please try again later. Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function createMovieCard(movie) {
+            console.log('Creating card for movie:', movie);
+            return `
+                <a href="/movie/${movie.id}" class="text-decoration-none">
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <img src="${movie.image_url}" alt="${movie.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                            <div class="movie-info">
+                                <h3 class="movie-title">${movie.title}</h3>
+                                <div class="movie-meta">
+                                    <span class="year">${movie.year}</span>
+                                    <span class="movie-rating">★ ${movie.rating.toFixed(1)}</span>
+                                </div>
+                                <div class="genres">
+                                    ${movie.genre.split(',').map(genre => 
+                                        `<span class="genre-badge">${genre.trim()}</span>`
+                                    ).join('')}
+                                </div>
+                                <p class="movie-description">${movie.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+
+        function renderMovies(movies) {
+            console.log('Rendering movies:', movies.length);
+            if (movies.length === 0) {
+                moviesGrid.innerHTML = `
+                    <div class="no-results">
+                        <h3>No movies found matching your criteria</h3>
+                        <p>Try adjusting your filters to see more results</p>
+                    </div>
+                `;
+                return;
+            }
+
+            moviesGrid.innerHTML = movies.map(movie => createMovieCard(movie)).join('');
+        }
+
+        function updatePaginationControls() {
+            const prevButton = document.getElementById('prevPage');
+            const nextButton = document.getElementById('nextPage');
+            const currentPageSpan = document.getElementById('currentPage');
+            const totalPagesSpan = document.getElementById('totalPages');
+
+            prevButton.disabled = currentPage <= 1;
+            nextButton.disabled = currentPage >= totalPages;
+            
+            currentPageSpan.textContent = currentPage;
+            totalPagesSpan.textContent = totalPages;
+        }
+
+        // Add pagination event listeners
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchMovies();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                fetchMovies();
+            }
+        });
+
+        // Reset pagination when filters change
+        function resetPagination() {
+            currentPage = 1;
+            fetchMovies();
+        }
+
+        // Update filter event listeners to reset pagination
+        rating.addEventListener('input', () => {
+            updateRatingValue();
+            resetPagination();
+        });
+
+        document.querySelectorAll('.genre-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', resetPagination);
+        });
+
+        yearInputs.forEach(input => {
+            input.addEventListener('change', resetPagination);
+        });
+
+        applyManualRating.addEventListener('click', () => {
+            const value = parseFloat(manualRating.value);
+            if (!isNaN(value) && value >= 0 && value <= 10) {
+                rating.value = value;
+                updateRatingValue();
+                resetPagination();
+            }
+        });
+
+        manualRating.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                applyManualRating.click();
+            }
+        });
+
+        // Initial load
+        fetchMovies();
+
+        // Remove the form submit event since we're updating in real-time
+        filterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Email - Movie Recommender{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="auth-card">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h4 class="mb-0">Verify Your Email</h4>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <form method="POST" action="{{ url_for('verify_email') }}">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="code" class="form-label">Verification Code</label>
+                                <input type="text" class="form-control verification-code" id="code" name="code" required maxlength="6" pattern="\d{6}">
+                                <div class="form-text">Enter the 6-digit code sent to your email</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Verify Email</button>
+                        </form>
+                        
+                        <div class="text-center mt-3">
+                            <p class="mb-0">Didn't receive the code? <a href="#" id="resendCode">Resend Code</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('resendCode').addEventListener('click', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    if (!email) {
+        alert('Please enter your email address first.');
+        return;
+    }
+    
+    fetch('/api/resend-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Verification code has been resent to your email.');
+        } else {
+            alert('Error sending verification code. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error sending verification code. Please try again.');
+    });
+});
+
+// Format verification code input
+document.querySelector('.verification-code').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-card {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.auth-card .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.auth-card .card-body {
+    padding: 2rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+.verification-code {
+    letter-spacing: 0.5em;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.alert {
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ movie.title }} - CineMatch Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --text-color: #ffffff;
+            --accent-color: #ff4081;
+            --bg-gradient: linear-gradient(135deg, rgba(26,26,26,0.95) 0%, rgba(26,26,26,0.8) 100%);
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .movie-header {
+            position: relative;
+            height: 70vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+        }
+
+        .movie-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-gradient);
+        }
+
+        .movie-poster {
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+
+        .movie-info {
+            margin-left: 2rem;
+            z-index: 1;
+        }
+
+        .genre-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .cast-section {
+            padding: 2rem 0;
+        }
+
+        .cast-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .cast-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .cast-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .crew-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .trailer-section {
+            margin: 2rem 0;
+        }
+
+        .trailer-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .trailer-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .stats-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-icon {
+            color: var(--accent-color);
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="movie-header" style="background-image: url('{{ movie.image_url }}');">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="movie-poster">
+                </div>
+                <div class="col-md-8 movie-info">
+                    <h1 class="display-4">{{ movie.title }}</h1>
+                    <div class="mb-3">
+                        {% for genre in movie.genre.split(',') %}
+                        <span class="genre-badge">{{ genre.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="stats-box">
+                                <i class="fas fa-star stats-icon"></i>
+                                <span>{{ movie.rating }}/10</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-box">
+                                <i class="fas fa-clock stats-icon"></i>
+                                <span>{{ movie.runtime }} min</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-box">
+                                <i class="fas fa-calendar stats-icon"></i>
+                                <span>{{ movie.year }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="lead">{{ movie.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="crew-section">
+            <h2 class="mb-4">Crew</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <h5><i class="fas fa-video stats-icon"></i> Director</h5>
+                    <p>{{ movie.director }}</p>
+                </div>
+                <div class="col-md-3">
+                    <h5><i class="fas fa-pen stats-icon"></i> Writer</h5>
+                    <p>{{ movie.writer }}</p>
+                </div>
+                <div class="col-md-3">
+                    <h5><i class="fas fa-music stats-icon"></i> Music Director</h5>
+                    <p>{{ movie.music_director }}</p>
+                </div>
+                <div class="col-md-3">
+                    <h5><i class="fas fa-camera stats-icon"></i> Cinematographer</h5>
+                    <p>{{ movie.cinematographer }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cast-section">
+            <h2 class="mb-4">Cast</h2>
+            <div class="row">
+                {% for actor in movie.cast %}
+                <div class="col-md-3 mb-4">
+                    <div class="cast-card">
+                        <img src="{{ actor.image_url }}" alt="{{ actor.name }}" class="cast-image mb-3">
+                        <h5>{{ actor.name }}</h5>
+                        <p class="text-muted">as {{ actor.character }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if movie.trailer_url %}
+        <div class="trailer-section">
+            <h2 class="mb-4">Trailer</h2>
+            <div class="trailer-container">
+                <iframe src="{{ movie.trailer_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+    <script>
+        // Dynamic theme based on movie poster
+        window.onload = function() {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = "{{ movie.image_url }}";
+            
+            img.onload = function() {
+                const colorThief = new ColorThief();
+                const palette = colorThief.getPalette(img, 2);
+                
+                const primaryColor = `rgb(${palette[0][0]}, ${palette[0][1]}, ${palette[0][2]})`;
+                const accentColor = `rgb(${palette[1][0]}, ${palette[1][1]}, ${palette[1][2]})`;
+                
+                document.documentElement.style.setProperty('--primary-color', primaryColor);
+                document.documentElement.style.setProperty('--accent-color', accentColor);
+                document.documentElement.style.setProperty('--bg-gradient', 
+                    `linear-gradient(135deg, ${primaryColor}f2 0%, ${primaryColor}cc 100%)`);
+            };
+        };
+    </script>
+</body>
+</html> 

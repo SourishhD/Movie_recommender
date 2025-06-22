@@ -1,0 +1,1 @@
+// This file is no longer needed as all JavaScript is now inline in home.html for better loading performance 
